@@ -43,12 +43,16 @@ HTML = """
     * {
         font-family: Ubuntu;
         text-align: center;
-        font-size: x-large;
         background-color: rgb(18, 95, 18);
         color: wheat;
     }
+
+    h1 {
+        font-size: xx-large
+    }
 </style>
-<h1>Recycling Classifier</h1>
+<h1>Recycling</h1>
+<h1>Classifier</h1>
 
 <form action="/predict" method="POST" enctype="multipart/form-data">
   <input type="file" name="file" required>
