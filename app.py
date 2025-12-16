@@ -48,7 +48,7 @@ HTML = """
     }
 
     h1 {
-        font-size: xx-large;
+        font-size: 50px;
     }
 </style>
 <h1>Recycling</h1>
