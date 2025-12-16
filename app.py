@@ -48,11 +48,11 @@ HTML = """
     }
 
     h1 {
-        font-size: 50px;
+        font-size: 90px;
     }
 
     h2 {
-        font-size: 30px;    
+        font-size: 40px;    
     }
 </style>
 <h1>Recycling</h1>
