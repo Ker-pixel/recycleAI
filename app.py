@@ -43,7 +43,7 @@ HTML = """
     * {
         font-family: Ubuntu;
         text-align: center;
-        font-size: larger;
+        font-size: x-large;
         background-color: rgb(18, 95, 18);
         color: wheat;
     }
