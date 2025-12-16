@@ -1,7 +1,8 @@
+import torch
+torch.set_num_threads(1)
 from flask import Flask, request, render_template_string
 from PIL import Image
 import io
-import torch
 import torch.nn.functional as F
 from torchvision import transforms
 from src.model import build_model
@@ -15,6 +16,11 @@ device = torch.device("cpu")
 model = build_model().to(device)
 model.load_state_dict(torch.load(MODEL_PATH, map_location=device))
 model.eval()
+
+# Warm-up inference to avoid first-request timeout
+with torch.no_grad():
+    dummy = torch.zeros(1, 3, 224, 224)
+    model(dummy)
 
 transform = transforms.Compose([
     transforms.Resize(256),
