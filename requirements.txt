@@ -3,4 +3,4 @@ flask
 gunicorn
 pillow
 torch==2.5.1+cpu
-torchvision==0.20.1+cpu
+torchvision==0.21.0+cpu
