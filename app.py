@@ -52,16 +52,22 @@ HTML = """
     }
 
     h2 {
-        font-size: 40px;    
+        font-size: 50px;    
+    }
+
+    * {
+        font-size: 30px;
     }
 </style>
 <h1>Recycling</h1>
 <h1>Classifier</h1>
+<div>
+    <form action="/predict" method="POST" enctype="multipart/form-data">
+    <input type="file" name="file" required>
+    <button type="submit">Analyze</button>
+    </form>    
+</div>
 
-<form action="/predict" method="POST" enctype="multipart/form-data">
-  <input type="file" name="file" required>
-  <button type="submit">Analyze</button>
-</form>
 
 {% if result %}
 <h2>Result: {{ result }}</h2>

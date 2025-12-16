@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<body style="font-family: Arial; padding: 40px;">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap" rel="stylesheet">
+<style>
+    * {
+        font-family: Ubuntu;
+        text-align: center;
+        background-color: rgb(18, 95, 18);
+        color: wheat;
+    }
+
+    h1 {
+        font-size: 90px;
+    }
+
+    h2 {
+        font-size: 50px;    
+    }
+
+    * {
+        font-size: 30px;
+    }
+</style>
+<h1>Recycling</h1>
+<h1>Classifier</h1>
+<div>
+    <form action="/predict" method="POST" enctype="multipart/form-data">
+    <input type="file" name="file" required>
+    <button type="submit">Analyze</button>
+    </form>    
+</div>
+
+
+{% if result %}
+<h2>Result: {{ result }}</h2>
+{% endif %}
+</body>
+</html>
