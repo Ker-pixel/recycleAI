@@ -50,6 +50,10 @@ HTML = """
     h1 {
         font-size: 50px;
     }
+
+    h2 {
+        font-size: 30px;    
+    }
 </style>
 <h1>Recycling</h1>
 <h1>Classifier</h1>
