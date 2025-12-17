@@ -1,8 +1,7 @@
-import torch
-torch.set_num_threads(1)
 from flask import Flask, request, render_template_string
-from PIL import Image
+from PIL import Image, UnidentifiedImageError
 import io
+import torch
 import torch.nn.functional as F
 from torchvision import transforms
 from src.model import build_model
@@ -17,10 +16,9 @@ model = build_model().to(device)
 model.load_state_dict(torch.load(MODEL_PATH, map_location=device))
 model.eval()
 
-# Warm-up inference to avoid first-request timeout
+# Warm-up
 with torch.no_grad():
-    dummy = torch.zeros(1, 3, 224, 224)
-    model(dummy)
+    model(torch.zeros(1, 3, 224, 224))
 
 transform = transforms.Compose([
     transforms.Resize(256),
@@ -32,42 +30,18 @@ transform = transforms.Compose([
     )
 ])
 
+ALLOWED_EXTENSIONS = {"jpg", "jpeg", "png"}
+
 HTML = """
 <!DOCTYPE html>
 <html>
 <body style="font-family: Arial; padding: 40px;">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap" rel="stylesheet">
-<style>
-    * {
-        font-family: Ubuntu;
-        text-align: center;
-        background-color: rgb(18, 95, 18);
-        color: wheat;
-    }
+<h1>Recycling Classifier</h1>
 
-    h1 {
-        font-size: 90px;
-    }
-
-    h2 {
-        font-size: 50px;    
-    }
-
-    * {
-        font-size: 30px;
-    }
-</style>
-<h1>Recycling</h1>
-<h1>Classifier</h1>
-<div>
-    <form action="/predict" method="POST" enctype="multipart/form-data">
-    <input type="file" name="file" required>
-    <button type="submit">Analyze</button>
-    </form>    
-</div>
-
+<form action="/predict" method="POST" enctype="multipart/form-data">
+  <input type="file" name="file" required>
+  <button type="submit">Analyze</button>
+</form>
 
 {% if result %}
 <h2>Result: {{ result }}</h2>
@@ -80,10 +54,31 @@ HTML = """
 def index():
     return render_template_string(HTML)
 
+
+def allowed_file(filename):
+    return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
 @app.route("/predict", methods=["POST"])
 def predict():
+    if "file" not in request.files:
+        return render_template_string(HTML, result="No file uploaded")
+
     file = request.files["file"]
-    img = Image.open(io.BytesIO(file.read())).convert("RGB")
+
+    if file.filename == "" or not allowed_file(file.filename):
+        return render_template_string(
+            HTML,
+            result="Unsupported file type. Please upload JPG or PNG images."
+        )
+
+    try:
+        img = Image.open(io.BytesIO(file.read())).convert("RGB")
+    except UnidentifiedImageError:
+        return render_template_string(
+            HTML,
+            result="Invalid image file. Please upload a valid JPG or PNG."
+        )
 
     x = transform(img).unsqueeze(0).to(device)
 
