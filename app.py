@@ -34,44 +34,71 @@ ALLOWED_EXTENSIONS = {"jpg", "jpeg", "png"}
 
 HTML = """
 <!DOCTYPE html>
-<html>
-<body style="font-family: Arial; padding: 40px;">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap" rel="stylesheet">
-<style>
-    * {
-        font-family: Ubuntu;
-        text-align: center;
-        background-color: rgb(18, 95, 18);
-        color: wheat;
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Recycling Classifier</title>
+
+  <!-- Google Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+  <!-- Favicon (PNG is fine) -->
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.png') }}">
+
+  <style>
+    body {
+      font-family: 'Ubuntu', sans-serif;
+      background-color: rgb(18, 95, 18);
+      color: wheat;
+      text-align: center;
+      padding: 40px;
     }
 
     h1 {
-        font-size: 90px;
+      font-size: 90px;
+      margin: 0;
+      line-height: 1.1;
     }
 
     h2 {
-        font-size: 50px;    
+      font-size: 50px;
+      margin-top: 40px;
     }
 
-    * {
-        font-size: 30px;
+    form {
+      margin-top: 50px;
     }
-</style>
-<h1>Recycling</h1>
-<h1>Classifier</h1>
-<div>
-    <form action="/predict" method="POST" enctype="multipart/form-data">
+
+    input[type="file"] {
+      font-size: 20px;
+      margin-bottom: 20px;
+    }
+
+    button {
+      font-size: 24px;
+      padding: 10px 24px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>Recycling</h1>
+  <h1>Classifier</h1>
+
+  <form action="/predict" method="POST" enctype="multipart/form-data">
     <input type="file" name="file" required>
+    <br>
     <button type="submit">Analyze</button>
-    </form>    
-</div>
+  </form>
 
+  {% if result %}
+    <h2>Result: {{ result }}</h2>
+  {% endif %}
 
-{% if result %}
-<h2>Result: {{ result }}</h2>
-{% endif %}
 </body>
 </html>
 """
