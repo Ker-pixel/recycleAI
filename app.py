@@ -1,7 +1,9 @@
+import torch
+torch.set_num_threads(1)
+
 from flask import Flask, request, render_template_string
 from PIL import Image, UnidentifiedImageError
 import io
-import torch
 import torch.nn.functional as F
 from torchvision import transforms
 from src.model import build_model
@@ -126,8 +128,9 @@ def predict():
         )
 
     try:
-        img = Image.open(io.BytesIO(file.read())).convert("RGB")
-    except UnidentifiedImageError:
+        img_bytes = file.read()
+        img = Image.open(io.BytesIO(img_bytes)).convert("RGB")
+    except Exception:
         return render_template_string(
             HTML,
             result="Invalid image file. Please upload a valid JPG or PNG."
