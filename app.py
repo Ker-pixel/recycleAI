@@ -34,6 +34,21 @@ transform = transforms.Compose([
 
 ALLOWED_EXTENSIONS = {"jpg", "jpeg", "png"}
 
+EXPLANATIONS = {
+    "recyclable_item": {
+        "label": "Recyclable item",
+        "text": "This item appears recyclable. Clean it if needed and follow your local recycling guidelines."
+    },
+    "non_recyclable_item": {
+        "label": "Non-recyclable item",
+        "text": "This item should not be placed in regular recycling. Dispose of it according to local waste rules."
+    },
+    "unknown": {
+        "label": "Unknown item",
+        "text": "The item could not be confidently identified. When in doubt, do not recycle."
+    }
+}
+
 HTML = """
 <!DOCTYPE html>
 <html lang="en">
@@ -88,17 +103,20 @@ HTML = """
 
 <body>
 
-  <h1>Geri Dönüşür</h1>
-  <h1>Mü ?</h1>
+  <h1>Recycling</h1>
+  <h1>Classifier</h1>
 
   <form action="/predict" method="POST" enctype="multipart/form-data">
     <input type="file" name="file" required>
     <br>
-    <button type="submit">Analiz Et</button>
+    <button type="submit">Analyze</button>
   </form>
 
   {% if result %}
-    <h2>Sonuç: {{ result }}</h2>
+    <h2>Result: {{ result }}</h2>
+    <p><strong>Detected item:</strong> {{ item }}</p>
+    <p><strong>Confidence:</strong> {{ confidence }}</p>
+    <p><strong>How to recycle:</strong> {{ explanation }}</p>
   {% endif %}
 
 </body>
@@ -117,14 +135,14 @@ def allowed_file(filename):
 @app.route("/predict", methods=["POST"])
 def predict():
     if "file" not in request.files:
-        return render_template_string(HTML, result="Dosya Yüklenmedi")
+        return render_template_string(HTML, result="No file uploaded")
 
     file = request.files["file"]
 
     if file.filename == "" or not allowed_file(file.filename):
         return render_template_string(
             HTML,
-            result="Desteklenmeyen Dosya. Lütfen JPG veya PNG veya JPEG yükleyin."
+            result="Unsupported file type. Please upload JPG or PNG images."
         )
 
     try:
@@ -143,9 +161,24 @@ def predict():
         probs = F.softmax(out, dim=1)
         conf, pred = torch.max(probs, 1)
 
-    if conf.item() < 0.55:
+    confidence = conf.item()
+    prediction = pred.item()
+
+    if confidence < 0.55:
+        item_key = "unknown"
         result = "not recyclable (no)"
     else:
-        result = "Geri Dönüştürülebilir (Evet)" if pred.item() == 1 else "Geri Dönüştürebilir Değil (Hayır)"
+        if prediction == 1:
+            item_key = "recyclable_item"
+            result = "recyclable (yes)"
+        else:
+            item_key = "non_recyclable_item"
+            result = "not recyclable (no)"
 
-    return render_template_string(HTML, result=result)
+    return render_template_string(
+        HTML,
+        result=result,
+        item=EXPLANATIONS[item_key]["label"],
+        explanation=EXPLANATIONS[item_key]["text"],
+        confidence=f"{confidence:.2f}"
+    )
