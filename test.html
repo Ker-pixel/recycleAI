@@ -46,6 +46,34 @@
       padding: 10px 24px;
       cursor: pointer;
     }
+    .card {
+    background-color: rgba(0, 0, 0, 0.25);
+    border-radius: 16px;
+    padding: 30px;
+    margin-top: 40px;
+    display: inline-block;
+    max-width: 600px;
+    }
+
+    .result-yes {
+      color: #9cff9c;
+    }
+
+    .result-no {
+      color: #ffb3b3;
+    }
+    input[type="file"] {
+      display: none;
+    }
+
+    .upload-label {
+      display: inline-block;
+      background-color: #2f7d2f;
+      padding: 14px 30px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 22px;
+    }
   </style>
 </head>
 
@@ -55,14 +83,28 @@
   <h1>Classifier</h1>
 
   <form action="/predict" method="POST" enctype="multipart/form-data">
-    <input type="file" name="file" required>
-    <br>
+    <label class="upload-label">
+      Choose image
+      <input type="file" name="file" required>
+    </label>
+    <br><br>
     <button type="submit">Analyze</button>
   </form>
 
   {% if result %}
-    <h2>Result: {{ result }}</h2>
+    <div class="card">
+      <h2 class="{{ 'result-yes' if 'yes' in result else 'result-no' }}">
+        {{ result }}
+      </h2>
+      <p><strong>Detected item:</strong> {{ item }}</p>
+      <p><strong>Confidence:</strong> {{ confidence }}</p>
+      <p><strong>How to recycle:</strong> {{ explanation }}</p>
+    </div>
   {% endif %}
+
+  <p style="opacity: 0.8; font-size: 16px; margin-top: 40px;">
+    Results are based on image appearance. Local recycling rules may vary.
+  </p>
 
 </body>
 </html>
