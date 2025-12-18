@@ -88,17 +88,17 @@ HTML = """
 
 <body>
 
-  <h1>Recycling</h1>
-  <h1>Classifier</h1>
+  <h1>Geri Dönüşür</h1>
+  <h1>Mü ?</h1>
 
   <form action="/predict" method="POST" enctype="multipart/form-data">
     <input type="file" name="file" required>
     <br>
-    <button type="submit">Analyze</button>
+    <button type="submit">Analiz Et</button>
   </form>
 
   {% if result %}
-    <h2>Result: {{ result }}</h2>
+    <h2>Sonuç: {{ result }}</h2>
   {% endif %}
 
 </body>
@@ -117,14 +117,14 @@ def allowed_file(filename):
 @app.route("/predict", methods=["POST"])
 def predict():
     if "file" not in request.files:
-        return render_template_string(HTML, result="No file uploaded")
+        return render_template_string(HTML, result="Dosya Yüklenmedi")
 
     file = request.files["file"]
 
     if file.filename == "" or not allowed_file(file.filename):
         return render_template_string(
             HTML,
-            result="Unsupported file type. Please upload JPG or PNG images."
+            result="Desteklenmeyen Dosya. Lütfen JPG veya PNG veya JPEG yükleyin."
         )
 
     try:
@@ -146,6 +146,6 @@ def predict():
     if conf.item() < 0.55:
         result = "not recyclable (no)"
     else:
-        result = "recyclable (yes)" if pred.item() == 1 else "not recyclable (no)"
+        result = "Geri Dönüştürülebilir (Evet)" if pred.item() == 1 else "Geri Dönüştürebilir Değil (Hayır)"
 
     return render_template_string(HTML, result=result)
