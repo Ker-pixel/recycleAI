@@ -36,16 +36,16 @@ ALLOWED_EXTENSIONS = {"jpg", "jpeg", "png"}
 
 EXPLANATIONS = {
     "recyclable_item": {
-        "label": "Recyclable item",
-        "text": "This item appears recyclable. Clean it if needed and follow your local recycling guidelines."
+        "label": "Geri dönüştürülebilir ürün",
+        "text": "Bu ürün geri dönüştürülebilir görünüyor. Gerekirse temizleyin ve yerel geri dönüşüm kurallarına göre atın."
     },
     "non_recyclable_item": {
-        "label": "Non-recyclable item",
-        "text": "This item should not be placed in regular recycling. Dispose of it according to local waste rules."
+        "label": "Geri dönüştürülemez ürün",
+        "text": "Bu ürün normal geri dönüşüme atılmamalıdır. Yerel atık kurallarına göre imha edin."
     },
     "unknown": {
-        "label": "Unknown item",
-        "text": "The item could not be confidently identified. When in doubt, do not recycle."
+        "label": "Bilinmeyen ürün",
+        "text": "Ürün güvenilir şekilde tanımlanamadı. Emin değilseniz geri dönüşüme atmayın."
     }
 }
 
@@ -54,7 +54,7 @@ HTML = """
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Recycling Classifier</title>
+  <title>Geri Dönüşüm Sınıflandırıcısı</title>
 
   <!-- Google Font -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -131,16 +131,16 @@ HTML = """
 
 <body>
 
-  <h1>Recycling</h1>
-  <h1>Classifier</h1>
+  <h1>Geri Dönüşüm</h1>
+  <h1>Sınıflandırıcısı</h1>
 
   <form action="/predict" method="POST" enctype="multipart/form-data">
     <label class="upload-label">
-      Choose image
+      Görsel seç
       <input type="file" name="file" required>
     </label>
     <br><br>
-    <button type="submit">Analyze</button>
+    <button type="submit">Analiz et</button>
   </form>
 
   {% if result %}
@@ -148,14 +148,14 @@ HTML = """
       <h2 class="{{ 'result-yes' if 'yes' in result else 'result-no' }}">
         {{ result }}
       </h2>
-      <p><strong>Detected item:</strong> {{ item }}</p>
-      <p><strong>Confidence:</strong> {{ confidence }}</p>
-      <p><strong>How to recycle:</strong> {{ explanation }}</p>
+      <p><strong>Tespit edilen ürün:</strong> {{ item }}</p>
+      <p><strong>Güven:</strong> {{ confidence }}</p>
+      <p><strong>Nasıl geri dönüştürülür:</strong> {{ explanation }}</p>
     </div>
   {% endif %}
 
   <p style="opacity: 0.8; font-size: 16px; margin-top: 40px;">
-    Results are based on image appearance. Local recycling rules may vary.
+    Sonuçlar görsel görünüme dayalıdır. Yerel geri dönüşüm kuralları değişiklik gösterebilir.
   </p>
 
 </body>
@@ -174,14 +174,14 @@ def allowed_file(filename):
 @app.route("/predict", methods=["POST"])
 def predict():
     if "file" not in request.files:
-        return render_template_string(HTML, result="No file uploaded")
+        return render_template_string(HTML, result="Dosya yüklenmedi")
 
     file = request.files["file"]
 
     if file.filename == "" or not allowed_file(file.filename):
         return render_template_string(
             HTML,
-            result="Unsupported file type. Please upload JPG or PNG images."
+            result="Desteklenmeyen dosya türü. Lütfen JPG veya PNG yükleyin."
         )
 
     try:
@@ -190,7 +190,7 @@ def predict():
     except Exception:
         return render_template_string(
             HTML,
-            result="Invalid image file. Please upload a valid JPG or PNG."
+            result="Geçersiz görsel dosyası. Lütfen geçerli bir JPG veya PNG yükleyin."
         )
 
     x = transform(img).unsqueeze(0).to(device)
@@ -205,14 +205,14 @@ def predict():
 
     if confidence < 0.55:
         item_key = "unknown"
-        result = "not recyclable (no)"
+        result = "geri dönüştürülemez (hayır)"
     else:
         if prediction == 1:
             item_key = "recyclable_item"
-            result = "recyclable (yes)"
+            result = "geri dönüştürülebilir (evet)"
         else:
             item_key = "non_recyclable_item"
-            result = "not recyclable (no)"
+            result = "geri dönüştürülemez (hayır)"
 
     return render_template_string(
         HTML,
