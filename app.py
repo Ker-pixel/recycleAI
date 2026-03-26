@@ -162,8 +162,10 @@ HTML_TEMPLATE = """
       {% endif %}
     </div>
   {% endif %}
-  window.onload = showAd; // Runs the function when the page loads
-</body>
+  <script>
+    window.onload = showAd; // This tells the browser to run your function
+  </script>
+  </body>
 </html>
 """
 
