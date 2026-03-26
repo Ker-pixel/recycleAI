@@ -162,6 +162,7 @@ HTML_TEMPLATE = """
       {% endif %}
     </div>
   {% endif %}
+  window.onload = showAd; // Runs the function when the page loads
 </body>
 </html>
 """
