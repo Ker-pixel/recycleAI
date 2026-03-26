@@ -115,9 +115,31 @@ HTML_TEMPLATE = """
     .result-yes { color: #9cff9c; }
     .result-no { color: #ffb3b3; }
     .co2-box { margin-top: 20px; padding: 15px; border: 1px solid #9cff9c; border-radius: 8px; background: rgba(156, 255, 156, 0.1); }
+    .ad-space {
+        width: 300px; /* Adjust the width as needed */
+        height: 250px; /* Adjust the height as needed */
+        background-color: #f0f0f0;
+        border: 1px solid #ccc;
+        padding: 10px;
+        text-align: center;
+        line-height: 250px;
+        font-size: 16px;
+        cursor: pointer;
+        }
   </style>
 </head>
 <body>
+    <script>
+    function showAd() {
+        // Replace 'ad.png' with the actual path to your ad image
+        const adImage = document.createElement('img');
+        adImage.src = 'ad.png';
+        adImage.alt = 'Advertisement';
+
+        // Append the ad image to the ad space
+        document.querySelector('.ad-space').appendChild(adImage);
+    }
+    </script>
   <h1>Geri Dönüşüm Sınıflandırıcısı</h1>
   <form action="/predict" method="POST" enctype="multipart/form-data">
     <label class="upload-label">Görsel seç <input type="file" name="file" required></label><br>
