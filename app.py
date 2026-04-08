@@ -96,50 +96,238 @@ def predict():
         co2_saved=info["co2_saved_kg"]
     )
 
-# --- UI Template (Stored at bottom to keep logic clean) ---
+# --- UI Template ---
 HTML_TEMPLATE = """
 <!DOCTYPE html>
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
-  <title>Geri Dönüşüm Sınıflandırıcısı</title>
-  <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;700&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VisionRecycle | AI Classifier</title>
+  <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&display=swap" rel="stylesheet">
   <style>
-    body { font-family: 'Ubuntu', sans-serif; background-color: rgb(18, 95, 18); color: wheat; text-align: center; padding: 40px; }
-    h1 { font-size: 60px; margin-bottom: 20px; }
-    .upload-label { display: inline-block; background-color: #2f7d2f; padding: 14px 30px; border-radius: 10px; cursor: pointer; margin-top: 20px; transition: 0.3s; }
-    .upload-label:hover { background-color: #3b9c3b; }
+    :root {
+      --bg-color: #070707;
+      --card-bg: #121212;
+      --volt: #ccff00;
+      --volt-hover: #b3e600;
+      --text-main: #f4f4f4;
+      --text-muted: #888888;
+      --border-color: #262626;
+      --error: #ff3366;
+    }
+    
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body { 
+      font-family: 'Ubuntu', sans-serif; 
+      background-color: var(--bg-color); 
+      color: var(--text-main); 
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+      background-image: radial-gradient(circle at 50% 0%, rgba(204, 255, 0, 0.05) 0%, transparent 60%);
+    }
+
+    .container {
+      width: 100%;
+      max-width: 520px;
+      text-align: center;
+    }
+
+    .logo {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      color: var(--volt);
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    h1 { 
+      font-size: 40px; 
+      font-weight: 700;
+      margin-bottom: 10px;
+      letter-spacing: -1px;
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 16px;
+      margin-bottom: 40px;
+      font-weight: 300;
+    }
+
+    .upload-area {
+      background-color: var(--card-bg);
+      border: 1px dashed var(--border-color);
+      border-radius: 16px;
+      padding: 40px 20px;
+      margin-bottom: 20px;
+      transition: all 0.3s ease;
+    }
+
+    .upload-area:hover {
+      border-color: var(--volt);
+      box-shadow: 0 0 20px rgba(204, 255, 0, 0.05);
+    }
+
+    .upload-label { 
+      display: inline-block; 
+      background-color: transparent; 
+      color: var(--volt);
+      border: 1px solid var(--volt);
+      padding: 14px 32px; 
+      border-radius: 8px; 
+      cursor: pointer; 
+      font-weight: 500;
+      font-size: 14px;
+      transition: 0.3s; 
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .upload-label:hover { 
+      background-color: var(--volt); 
+      color: #000;
+      box-shadow: 0 0 15px rgba(204, 255, 0, 0.4);
+    }
+
     input[type="file"] { display: none; }
-    button { font-size: 24px; padding: 10px 24px; cursor: pointer; border-radius: 8px; background-color: wheat; color: #125f12; font-weight: bold; border: none; margin-top: 10px; }
-    .card { background-color: rgba(0, 0, 0, 0.25); border-radius: 16px; padding: 30px; margin: 40px auto; max-width: 500px; border: 1px solid rgba(255,255,255,0.1); }
-    .result-yes { color: #9cff9c; }
-    .result-no { color: #ffb3b3; }
-    .co2-box { margin-top: 20px; padding: 15px; border: 1px solid #9cff9c; border-radius: 8px; background: rgba(156, 255, 156, 0.1); }
+
+    button { 
+      width: 100%;
+      font-family: 'Ubuntu', sans-serif;
+      font-size: 16px; 
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 18px 24px; 
+      cursor: pointer; 
+      border-radius: 12px; 
+      background-color: var(--volt); 
+      color: #000; 
+      font-weight: 700; 
+      border: none; 
+      transition: all 0.3s ease;
+    }
+
+    button:hover {
+      background-color: var(--volt-hover);
+      box-shadow: 0 0 25px rgba(204, 255, 0, 0.3);
+      transform: translateY(-2px);
+    }
+
+    .card { 
+      background-color: var(--card-bg); 
+      border-radius: 16px; 
+      padding: 35px; 
+      margin-top: 35px; 
+      border: 1px solid var(--border-color); 
+      text-align: left;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    }
+
+    .card h2 {
+      font-size: 22px;
+      margin-bottom: 25px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid var(--border-color);
+      letter-spacing: 1px;
+    }
+
+    .result-yes { color: var(--volt); }
+    .result-no { color: var(--error); }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 15px;
+      font-size: 15px;
+    }
+
+    .stat-label { color: var(--text-muted); }
+    .stat-value { font-weight: 500; }
+
+    .co2-box { 
+      margin-top: 30px; 
+      padding: 18px; 
+      border: 1px solid rgba(204, 255, 0, 0.3); 
+      border-radius: 12px; 
+      background: rgba(204, 255, 0, 0.05); 
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .co2-box p {
+      margin: 0;
+      font-size: 14px;
+      color: var(--volt);
+    }
+
+    .error-msg {
+      color: var(--error);
+      margin-top: 20px;
+      font-size: 14px;
+      background: rgba(255, 51, 102, 0.1);
+      padding: 15px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 51, 102, 0.2);
+    }
   </style>
 </head>
 <body>
-  <h1>Geri Dönüşüm Sınıflandırıcısı</h1>
-  <form action="/predict" method="POST" enctype="multipart/form-data">
-    <label class="upload-label">Görsel seç <input type="file" name="file" required></label><br>
-    <button type="submit">Analiz et</button>
-  </form>
+  <div class="container">
+    <div class="logo">VisionRecycle AI</div>
+    <h1>Geri Dönüşüm Sınıflandırıcısı</h1>
+    <p class="subtitle">Yapay zeka destekli atık analizi ve karbon ayak izi tahmini</p>
 
-  {% if error %}<p style="color: #ffb3b3; margin-top: 20px;">{{ error }}</p>{% endif %}
-
-  {% if result %}
-    <div class="card">
-      <h2 class="{{ 'result-yes' if 'evet' in result else 'result-no' }}">{{ result | upper }}</h2>
-      <p><strong>Ürün:</strong> {{ item }}</p>
-      <p><strong>Güven Skoru:</strong> %{{ (confidence|float * 100)|round(2) }}</p>
-      <p><strong>Bilgi:</strong> {{ explanation }}</p>
-      
-      {% if co2_saved > 0 %}
-      <div class="co2-box">
-        <p style="margin:0;">🌍 <strong>Tahmini Kurtarılan Karbon:</strong> {{ co2_saved }} kg CO2e</p>
+    <form action="/predict" method="POST" enctype="multipart/form-data">
+      <div class="upload-area">
+        <label class="upload-label">
+          Görsel Seç
+          <input type="file" name="file" required onchange="document.getElementById('file-name').textContent = this.files[0].name;">
+        </label>
+        <p id="file-name" style="margin-top: 15px; font-size: 13px; color: var(--text-muted);"></p>
       </div>
-      {% endif %}
-    </div>
-  {% endif %}
+      <button type="submit">Analiz Et</button>
+    </form>
+
+    {% if error %}
+      <div class="error-msg">{{ error }}</div>
+    {% endif %}
+
+    {% if result %}
+      <div class="card">
+        <h2 class="{{ 'result-yes' if 'evet' in result else 'result-no' }}">SONUÇ: {{ result | upper }}</h2>
+        
+        <div class="stat-row">
+          <span class="stat-label">Tespit Edilen Ürün</span>
+          <span class="stat-value">{{ item }}</span>
+        </div>
+        
+        <div class="stat-row">
+          <span class="stat-label">Model Güven Skoru</span>
+          <span class="stat-value">%{{ (confidence|float * 100)|round(2) }}</span>
+        </div>
+        
+        <div class="stat-row" style="flex-direction: column; gap: 8px; margin-top: 25px;">
+          <span class="stat-label">Analiz Özeti</span>
+          <span class="stat-value" style="line-height: 1.6; color: var(--text-main);">{{ explanation }}</span>
+        </div>
+        
+        {% if co2_saved > 0 %}
+        <div class="co2-box">
+          <span style="font-size: 18px;">⚡</span>
+          <p><strong>Tahmini Kurtarılan Karbon:</strong> {{ co2_saved }} kg CO2e</p>
+        </div>
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
 </body>
 </html>
 """
